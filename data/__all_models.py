@@ -20,6 +20,11 @@ class Short_url(SqlAlchemyBase):
         sqlalchemy.DateTime,
         default=datetime.datetime.now
     )
+    pairs = orm.relation("Pair", back_populates='short')
+    transitions = orm.relation("Transition", back_populates='short')
+
+    def __repr__(self):
+        return f"Short: {self.url}, created: {self.created}"
 
 
 class Long_url(SqlAlchemyBase):
@@ -34,6 +39,10 @@ class Long_url(SqlAlchemyBase):
         sqlalchemy.Text,
         default='https://ru.wikipedia.org/wiki/NULL'
     )
+    pairs = orm.relation("Pair", back_populates='long')
+
+    def __repr__(self):
+        return f"Long: {self.url}"
 
 
 class Pair(SqlAlchemyBase):
@@ -44,8 +53,19 @@ class Pair(SqlAlchemyBase):
         primary_key=True,
         autoincrement=True
     )
-    short = orm.relation(Short_url)
-    long = orm.relation(Long_url)
+    short_id = sqlalchemy.Column(
+        sqlalchemy.Integer,
+        sqlalchemy.ForeignKey("short_urls.id")
+    )
+    short = orm.relation(Short_url, back_populates='pairs')
+    long_id = sqlalchemy.Column(
+        sqlalchemy.Integer,
+        sqlalchemy.ForeignKey("long_urls.id")
+    )
+    long = orm.relation(Long_url, back_populates='pairs')
+
+    def __repr__(self):
+        return f"Link: {self.short_id} -> {self.long_id}"
 
 
 class Transition(SqlAlchemyBase):
@@ -56,8 +76,15 @@ class Transition(SqlAlchemyBase):
         primary_key=True,
         autoincrement=True
     )
-    short = orm.relation(Short_url)
+    short_id = sqlalchemy.Column(
+        sqlalchemy.Integer,
+        sqlalchemy.ForeignKey("short_urls.id")
+    )
+    short = orm.relation(Short_url, back_populates='transitions')
     time = sqlalchemy.Column(
         sqlalchemy.DateTime,
         default=datetime.datetime.now
     )
+
+    def __repr__(self):
+        return f"Transition: {self.short_id} at {self.time}"
