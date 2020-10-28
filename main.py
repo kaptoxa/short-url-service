@@ -1,13 +1,9 @@
-from flask import Flask
 from data import db
-from config import USER, PSWD, HOST, DB_NAME, SECRET_KEY
+from config import USER, PSWD, HOST, DB_NAME
+
+from misc import app
 
 import handlers
-
-app = Flask(__name__)
-app.config['SECRET_KEY'] = SECRET_KEY
-
-
 
 def main():
     db.global_init(USER, PSWD, HOST, DB_NAME)
