@@ -20,7 +20,7 @@ class Short_url(SqlAlchemyBase):
         sqlalchemy.DateTime,
         default=datetime.datetime.now
     )
-    pairs = orm.relation("Pair", back_populates='short')
+    long = orm.relation("Long_url", secondary="pairs", back_populates='short')
     transitions = orm.relation("Transition", back_populates='short')
 
     def __repr__(self):
@@ -39,10 +39,10 @@ class Long_url(SqlAlchemyBase):
         sqlalchemy.Text,
         default='https://ru.wikipedia.org/wiki/NULL'
     )
-    pairs = orm.relation("Pair", back_populates='long')
+    short = orm.relation("Short_url", secondary="pairs", back_populates='long')
 
     def __repr__(self):
-        return f"Long: {self.url}"
+        return f"Long: {self.url}, id: {self.id}"
 
 
 class Pair(SqlAlchemyBase):
@@ -55,14 +55,16 @@ class Pair(SqlAlchemyBase):
     )
     short_id = sqlalchemy.Column(
         sqlalchemy.Integer,
-        sqlalchemy.ForeignKey("short_urls.id")
+        sqlalchemy.ForeignKey("short_urls.id"),
+        unique=True,
+        nullable=False
     )
-    short = orm.relation(Short_url, back_populates='pairs')
     long_id = sqlalchemy.Column(
         sqlalchemy.Integer,
-        sqlalchemy.ForeignKey("long_urls.id")
+        sqlalchemy.ForeignKey("long_urls.id"),
+        unique=True,
+        nullable=False
     )
-    long = orm.relation(Long_url, back_populates='pairs')
 
     def __repr__(self):
         return f"Link: {self.short_id} -> {self.long_id}"
