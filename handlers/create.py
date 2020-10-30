@@ -20,7 +20,7 @@ def long_to_short():
     last_one = session.query(Long_url).order_by(Long_url.id.desc()).first()
 
     short_url = hashids.encode(last_one.id + 1 if last_one else 1)
-    short = Short_url(url=f'https://localhost:5000/{short_url}')
+    short = Short_url(url=short_url)
     short.long = [long]
 
     session.add(short)
