@@ -1,92 +1,61 @@
 import datetime
-import sqlalchemy
+import sqlalchemy as sa
 from sqlalchemy import orm
 from .db import SqlAlchemyBase
+from marshmallow import Schema, fields, ValidationError, pre_load, post_load
+from hashids import Hashids
+
+from pprint import pprint
 
 
-class Short_url(SqlAlchemyBase):
+### MODELS ###
+
+class ShortUrl(SqlAlchemyBase):
     __tablename__ = 'short_urls'
 
-    id = sqlalchemy.Column(
-        sqlalchemy.Integer,
-        primary_key=True,
-        autoincrement=True
-    )
-    url = sqlalchemy.Column(
-        sqlalchemy.String,
-        unique=True
-    )
-    created = sqlalchemy.Column(
-        sqlalchemy.DateTime,
-        default=datetime.datetime.now
-    )
-    long = orm.relation("Long_url", secondary="pairs", back_populates='short')
-    transitions = orm.relation("Transition", back_populates='short')
+    id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
+    url = sa.Column(sa.String, unique=True)
+    long_id = sa.Column(sa.Integer, sa.ForeignKey("long_urls.id"))
+
+    long = orm.relation("LongUrl", back_populates='short')
+    jumps_count = sa.Column(sa.Integer, default=0)
 
     def __repr__(self):
-        return f"Short: {self.url}, created: {self.created}"
+        return f"Short link ({self.id}): {self.url}"
 
 
-class Long_url(SqlAlchemyBase):
+class LongUrl(SqlAlchemyBase):
     __tablename__ = 'long_urls'
 
-    id = sqlalchemy.Column(
-        sqlalchemy.Integer,
-        primary_key=True,
-        autoincrement=True
-    )
-    url = sqlalchemy.Column(
-        sqlalchemy.Text,
-        default='https://ru.wikipedia.org/wiki/NULL'
-    )
-    short = orm.relation("Short_url", secondary="pairs", back_populates='long')
-
-    def __repr__(self):
-        return f"Long: {self.url}, id: {self.id}"
+    id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
+    url = sa.Column(sa.Text)
+    short = orm.relation(ShortUrl, back_populates='long')
 
 
-class Pair(SqlAlchemyBase):
-    __tablename__ = 'pairs'
-
-    id = sqlalchemy.Column(
-        sqlalchemy.Integer,
-        primary_key=True,
-        autoincrement=True
-    )
-    short_id = sqlalchemy.Column(
-        sqlalchemy.Integer,
-        sqlalchemy.ForeignKey("short_urls.id"),
-        unique=True,
-        nullable=False
-    )
-    long_id = sqlalchemy.Column(
-        sqlalchemy.Integer,
-        sqlalchemy.ForeignKey("long_urls.id"),
-        unique=True,
-        nullable=False
-    )
-
-    def __repr__(self):
-        return f"Link: {self.short_id} -> {self.long_id}"
+### SCHEMAS ###
 
 
-class Transition(SqlAlchemyBase):
-    __tablename__ = 'transitions'
+class SchemaShortUrl(Schema):
+    id = fields.Int(dump_only=True)
+    url = fields.Str(data_key='short_link')
+    jumps_count = fields.Int(data_key='count')
+    long_id = fields.Int()
 
-    id = sqlalchemy.Column(
-        sqlalchemy.Integer,
-        primary_key=True,
-        autoincrement=True
-    )
-    short_id = sqlalchemy.Column(
-        sqlalchemy.Integer,
-        sqlalchemy.ForeignKey("short_urls.id")
-    )
-    short = orm.relation(Short_url, back_populates='transitions')
-    time = sqlalchemy.Column(
-        sqlalchemy.DateTime,
-        default=datetime.datetime.now
-    )
+    @pre_load
+    def create_hashid(self, data, **kwargs):
+        url = data.get('short_link')
+        if not url:
+            pass
+            # raise exception...
+        data['short_link'] = Hashids().encode(url)
+        return data
 
-    def __repr__(self):
-        return f"Transition: {self.short_id} at {self.time}"
+    @post_load
+    def make_link(self, data, **kwargs):
+        return ShortUrl(url=data['url'], long_id=Hashids().decode(data['url']))
+
+
+class SchemaLongUrl(Schema):
+    id = fields.Int(dump_only=True)
+    url = fields.Str(data_key='long_url', required=True)
+
