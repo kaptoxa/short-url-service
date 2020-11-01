@@ -3,18 +3,20 @@ import sqlalchemy.orm as orm
 from sqlalchemy.orm import Session
 import sqlalchemy.ext.declarative as dec
 
+from config import USER, PSWD, HOST, DB_NAME
+
 SqlAlchemyBase = dec.declarative_base()
 
 __factory = None
 
 
-def global_init(user, pswd, host, db_name):
+def global_init():
     global __factory
 
     if __factory:
         return
 
-    conn_str = f'postgresql+psycopg2://{user}:{pswd}@{host}/{db_name}'
+    conn_str = f'postgresql+psycopg2://{USER}:{PSWD}@{HOST}/{DB_NAME}'
     print(f"Подключение к базе данных по адресу {conn_str}")
 
     engine = sa.create_engine(conn_str, echo=False)
