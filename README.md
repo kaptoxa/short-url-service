@@ -1,4 +1,3 @@
-# short-url-service
+Тестовое задание
 
-Духоментация тут
-https://app.swaggerhub.com/apis/8-pink-dino/short-url-service/1.0.0#/
+[Духоментация](https://app.swaggerhub.com/apis/8-pink-dino/short-url-service/1.0.0#/)
