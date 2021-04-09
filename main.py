@@ -45,7 +45,7 @@ def transition(link):
         session.commit()
         return redirect(short.long.url)
     else:
-        return jsonify({'error': f'Sorry. We don not have created \'{link}\' short link.'})
+        return jsonify({'error': f'Sorry. We don not have created \'{link}\' short link.'}), 409
 
 
 @app.route('/statistics/<link>', methods=['GET'])
@@ -55,7 +55,7 @@ def statistics(link):
     if short:
         return short_schema.dumps(short)
     else:
-        return jsonify({'error': f'Sorry. We don not have created \'{link}\' short link.'})
+        return jsonify({'error': f'Sorry. We don not have created \'{link}\' short link.'}), 409
 
 
 def main():

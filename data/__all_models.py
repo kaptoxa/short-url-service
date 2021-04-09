@@ -45,7 +45,7 @@ class SchemaShortUrl(Schema):
     def create_hashid(self, data, **kwargs):
         url = data.get('short_link')
         if not url:
-            url = 1
+            url = 1  # oops... record with id = 1 in short_urls will be rewriting
             # raise exception...
         data['short_link'] = Hashids().encode(url)
         return data
