@@ -4,13 +4,15 @@
 
 1). PostgreSQL,
 
-2). Flask,
+2). SQLAlchemy
 
-3). Marshmallow для сериализации/десереиализации
+3). Flask,
 
-4). Swagger для документации.
+4). Marshmallow для сериализации/десереиализации
 
-5). Написать тесты с помощью pytest
+5). Swagger для документации.
+
+6). Написать тесты с помощью pytest
 
 [Духоментация](https://app.swaggerhub.com/apis/8-pink-dino/short-url-service/1.0.0#/)
 
