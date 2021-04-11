@@ -2,12 +2,24 @@
 
 Написать сервис коротких ссылок, используя:
 
-PostgreSQL,
+1). PostgreSQL,
 
-Flask,
+2). Flask,
 
-Marshmallow
+3). Marshmallow для сериализации/десереиализации
 
-и Swagger для документации.
+4). Swagger для документации.
+
+5). Написать тесты с помощью pytest
 
 [Духоментация](https://app.swaggerhub.com/apis/8-pink-dino/short-url-service/1.0.0#/)
+
+
+После установки необходимых библиотек нужно создать файл config.py, в котором прописать:
+
+1) HOST сервера базы данных
+2) USER пользователя БД
+3) PSWD пароль
+4) DB_NAME имя базы данных
+5) SECRET_KEY для flask
+6) и API_URL для самого сервиса
