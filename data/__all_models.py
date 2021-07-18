@@ -14,7 +14,7 @@ class ShortUrl(SqlAlchemyBase):
     __tablename__ = 'short_urls'
 
     id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
-    url = sa.Column(sa.String, unique=True)
+    url = sa.Column(sa.String(length=255), unique=True)
     long_id = sa.Column(sa.Integer, sa.ForeignKey("long_urls.id"))
 
     long = orm.relation("LongUrl", back_populates='short')
